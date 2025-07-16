@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: Financial Services API
+  version: 1.0.0
+  description: RESTful API for financial transactions and balances
+servers:
+  - url: http://localhost:8000/v1
+    description: Local development server
+security:
+  - bearerAuth: []
+paths:
+  /accounts/{accountId}/balance:
+    get:
+      summary: Get account balance
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Account balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '404':
+          description: Account not found
+  /transactions:
+    post:
+      summary: Create a new transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Invalid request data
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    BalanceResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        availableBalance:
+          type: string
+        currency:
+          type: string
+          enum: [USD, EUR]
+        lastUpdated:
+          type: string
+          format: date-time
+      required:
+        - accountId
+        - availableBalance
+        - currency
+        - lastUpdated
+    TransactionRequest:
+      type: object
+      properties:
+        idempotencyKey:
+          type: string
+        fromAccountId:
+          type: string
+          format: uuid
+        toAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: string
+        currency:
+          type: string
+          enum: [USD, EUR]
+      required:
+        - idempotencyKey
+        - fromAccountId
+        - toAccountId
+        - amount
+        - currency
+    TransactionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, completed, failed]
+        fromAccountId:
+          type: string
+          format: uuid
+        toAccountId:
+          type: string
+          format: uuid
+        amount:
+          type: string
+        currency:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - status
+        - fromAccountId
+        - toAccountId
+        - amount
+        - currency
+        - createdAt

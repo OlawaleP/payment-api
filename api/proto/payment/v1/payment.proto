@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package financial.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service TransactionService {
+  rpc CreateTransaction(CreateTransactionRequest) returns (TransactionResponse);
+  rpc GetBalance(GetBalanceRequest) returns (BalanceResponse);
+}
+
+message GetBalanceRequest {
+  string account_id = 1;
+}
+
+message BalanceResponse {
+  string account_id = 1;
+  string available_balance = 2;
+  string currency = 3;
+  google.protobuf.Timestamp last_updated = 4;
+}
+
+message CreateTransactionRequest {
+  string idempotency_key = 1;
+  string from_account_id = 2;
+  string to_account_id = 3;
+  string amount = 4;
+  string currency = 5;
+}
+
+message TransactionResponse {
+  string id = 1;
+  string status = 2;
+  string from_account_id = 3;
+  string to_account_id = 4;
+  string amount = 5;
+  string currency = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
